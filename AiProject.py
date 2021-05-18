@@ -7,81 +7,69 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.widget import Widget
 from kivy.lang import Builder, builder
-from kivy.graphics import Ellipse,Color,Line
+from kivy.graphics import Ellipse,Color,Line,InstructionGroup,Rectangle
 from math import sqrt
 
-
+RADIUS = 15
 
 
 class MyBoxLayout(Widget):
     alphabetOrder = 'A'
-    circleLabelList = []
+    LabelDict = {}
+    circleDict = {}
     def spinner_clicked(self,value):
         pass
-    def clearButton(self):
-        self.canvas.clear()
-    def drawCircle(self,x,y,diameter):
-        myEllipse = Ellipse(pos=(x,y),size=(diameter,diameter))
-        self.canvas.add(myEllipse)
 
+    def clearStuff(self):
+        for key in self.LabelDict:
+            self.remove_widget(self.LabelDict[key])
+        self.ids.canvasID.canvas.clear()
+        self.LabelDict = {}
+        self.circleDict = {}
+        self.alphabetOrder = 'A'
+        with self.ids.canvasID.canvas:
+            Color(1,1,1,1, mode = 'rgba')
+            Rectangle(size = self.ids.canvasID.size,pos = self.ids.canvasID.pos)
 
-
-    
     
     def on_touch_up(self, touch):
-        if(touch.y < self.size[1]*0.75):
+
+        if(touch.y < self.ids.canvasID.size[1] and touch.y > RADIUS + 20 and touch.x> RADIUS + 20 and touch.x<self.ids.canvasID.size[0]-RADIUS):
+
             if(self.ids.node_button.state == 'down'):
-                with self.ids.canvasID.canvas:
-                    self.canvas.add(Color(rgb=(1,0,0)))
-                    myEllipse = Ellipse(pos=(touch.x-30,touch.y-30),size=(60,60))
-                    l = Label(text= self.alphabetOrder, pos= [touch.x-30,touch.y-30],font_size=32,color= (0,0,0,1),
-                    size = (60,60),pos_hint = (1,1),size_hint=(0.2,0.2))
-                    
-                    self.alphabetOrder = chr(ord(self.alphabetOrder) + 1)
-                    self.canvas.add(myEllipse)
-                    self.add_widget(l)
-                    self.circleLabelList.append([myEllipse,l])
-                    print(self.circleLabelList)
-                    return
-            if(self.ids.rightArrowID.state == 'down'):
+
+                self.obj = InstructionGroup()
+                self.obj.add(Color(rgb=(1,0,0)))
+                self.obj.add(Ellipse(pos=(touch.x-RADIUS,touch.y-RADIUS),size=(RADIUS*2,RADIUS*2)))
+                self.ids.canvasID.canvas.add(self.obj)
+                l = Label(text= self.alphabetOrder, pos = [touch.x-RADIUS,touch.y-RADIUS],font_size = 15,color = (0,0,0,1),
+                size = (RADIUS*2,RADIUS*2),pos_hint = (1,1),size_hint=(0.2,0.2))
+                self.LabelDict[self.alphabetOrder] = l
+                self.circleDict[self.alphabetOrder] = self.obj
+                self.alphabetOrder = chr(ord(self.alphabetOrder) + 1)
+                self.add_widget(l)
+                #create a new Node
+                return
+
+            elif(self.ids.rightArrowID.state == 'down'):
                 with self.ids.canvasID.canvas:
                     self.canvas.add(Color(rgb=(0,0,0)))
                     myLine = Line()
                     print(self.nodes)
                     return
-            if(self.ids.clearButtonID.state == 'down'):
-                for i in self.circleLabelList:
-                    print('IN FOR LOOP.... \n\n\n')
-                    print(self.circleLabelList)
-                    print(i)
-                    touchPoint = [touch.x,touch.y]
-                    print('touch x = {} \n touch y = {} \n'.format(touchPoint[0],touchPoint[1]))
-                    nodeCenter = [i[0].pos[0],i[0].pos[1]]
-                    print('center x = {} \n center y = {} \n'.format(nodeCenter[0],nodeCenter[1]))
-                    magnitude = sqrt((touchPoint[0]-nodeCenter[0])**2 + (touchPoint[1]-nodeCenter[1])**2)
-                    print(magnitude)
-                    if(magnitude<50):
-                        #i[0].pos = (-1000000000,-100000000)
-                        print(i[1])
-                        self.remove_widget(self.circleLabelList[0][1])
-                        self.canvas.ask_update()
-                        self.canvas.remove(i[0])
-                        
-                        
-                        
-                        #self.drawCircle(nodeCenter[0],nodeCenter[1],60)
-                        
-                        
+
+            elif(self.ids.clearButtonID.state == 'down'):
+                for key in self.LabelDict:
+                    if touch.x > self.LabelDict[key].x and touch.y > self.LabelDict[key].pos[1] and touch.x < self.LabelDict[key].pos[0]+60 and touch.y<self.LabelDict[key].pos[1]+60:
+                        l = self.LabelDict.pop(key)
+                        item = self.circleDict.pop(key)
+                        self.remove_widget(l)
+                        self.ids.canvasID.canvas.remove(item)
+                        break
+                return
+                #delete Node
                 
                 
-
-
-                    
-                    
-                    return
-    
-    
-
 class mohsenApp(App):
     def build(self):
        return MyBoxLayout()

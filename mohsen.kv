@@ -10,11 +10,9 @@
         size:root.width,root.height
         padding:'25dp'
         spacing:10
-        size_hint_y:None
-        size_hint:(1,0.15)
         BoxLayout:
             orientation: 'horizontal'
-            size_hint_y:None
+            size_hint:(1,0.15)
             Button:
                 text: 'Export'
                 pos_hint:{'top':1}
@@ -89,6 +87,11 @@
                     center_x: self.parent.x + self.parent.width/1.45
                     size: 15,15
                     allow_stretch: True
+            Button:
+                text:'reset'
+                pos_hint:{'top':1}
+                size_hint:(0.15,0.5)
+                on_press:root.clearStuff()
         FloatLayout:
             size_hint:(1,0.85)
             id:canvasID

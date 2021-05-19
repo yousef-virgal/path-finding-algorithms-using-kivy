@@ -7,11 +7,13 @@ from kivy.uix.widget import Widget
 from kivy.lang import Builder, builder
 from kivy.graphics import Ellipse,Color,Line,InstructionGroup,Rectangle
 from algo import Node,Graph 
+from kivy.animation import Animation
 
-RADIUS = 15
+RADIUS = 22
 
 
 class MyBoxLayout(Widget):
+    toggleButtons = []    
     alphabetOrder = 'A'
     #dictionary contains all the labels letters as keys and label objects as values to add  them to the canvas
     LabelDict = {}
@@ -25,6 +27,18 @@ class MyBoxLayout(Widget):
     count = 1
     # variable indicating if a node is a start node or not
     startNode = True
+    #Constructor -->
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.toggleButtons = [self.ids.node_button, self.ids.clearButtonID, self.ids.rightArrowID]
+    def makeAllButtonsUp(self,savedbutton):
+        for i in self.toggleButtons:
+            if i == savedbutton:
+                continue
+            else:
+                i.state = 'normal'
+    def animate_button(self,widget):
+        pass
 
     def spinner_clicked(self,value):
         pass
@@ -125,7 +139,7 @@ class MyBoxLayout(Widget):
                                 self.obj = InstructionGroup()
                                 self.obj.add(Color(0,0,0,1,mode='rgba'))
                                 self.obj.add(Line(points=[self.LabelDict[self.firstNode][0].x+RADIUS, self.LabelDict[self.firstNode][0].y+RADIUS,
-                                self.LabelDict[key][0].x +RADIUS, self.LabelDict[key][0].y+RADIUS],width = 3))
+                                self.LabelDict[key][0].x +RADIUS, self.LabelDict[key][0].y+RADIUS],width = 2))
                                 self.graph[self.firstNode][key] = self.obj
                                 self.ids.canvasID.canvas.add(self.obj)
 

@@ -5,14 +5,18 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.widget import Widget
 from kivy.lang import Builder, builder
+from kivy.properties import ObjectProperty
 from kivy.graphics import Ellipse,Color,Line,InstructionGroup,Rectangle
-from algo import Node,Graph 
+from algo import Node,Graph
+from arrow import * 
 from kivy.animation import Animation
+import math
 
 RADIUS = 22
 
 
 class MyBoxLayout(Widget):
+
     toggleButtons = []    
     alphabetOrder = 'A'
     #dictionary contains all the labels letters as keys and label objects as values to add  them to the canvas
@@ -27,32 +31,48 @@ class MyBoxLayout(Widget):
     count = 1
     # variable indicating if a node is a start node or not
     startNode = True
+    #coust = ObjectProperty(None)
+
     #Constructor -->
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.toggleButtons = [self.ids.node_button, self.ids.clearButtonID, self.ids.rightArrowID]
+
+
     def makeAllButtonsUp(self,savedbutton):
         for i in self.toggleButtons:
             if i == savedbutton:
                 continue
             else:
                 i.state = 'normal'
+
+
     def animate_button(self,widget):
         pass
 
     def spinner_clicked(self,value):
         pass
     
+
+
     #convert the dictionary to node list object should be called before creating the graph and passing the result to the graph object
-    def convertNodesToList(self,dict):
+    def convertNodesToList(self):
         list = []
-        for key in dict:
+        for key in self.LabelDict:
             xPos = self.LabelDict[key][0].x
             yPos = self.LabelDict[key][0].y 
             isEnd = self.LabelDict[key][1]
-            list.append(Node(key,xPos,yPos,isEnd))
+            list.append(Node(xPos,yPos,key,isEnd))
         return list 
     
+    def convertEdges(self):
+        edges = []
+        for firstKey in self.graph:
+            for secondKey in self.graph[firstKey]:
+                edges.append((firstKey,secondKey,self.graph[firstKey][secondKey][1]))
+        return edges
+
+
     # draws a node on to the screen
     def drawNode(self,touch):
         # inillize an instruction group for this node
@@ -82,21 +102,35 @@ class MyBoxLayout(Widget):
         #incrments the letter
         self.alphabetOrder = chr(ord(self.alphabetOrder) + 1)
 
+
+
     #deletes a node from th screen
     def clearNode(self,x,y):
         #loop through the label dictionary cheking if the x and y postion from the touch lay in the boundries of one of them
         for key in self.LabelDict:
                     if x > self.LabelDict[key][0].x and y > self.LabelDict[key][0].y and x < self.LabelDict[key][0].x+RADIUS*2 and y<self.LabelDict[key][0].y+RADIUS*2:
                         #delete a all edges pointing from this node to other nodes
+
+
                         for secondKey in self.graph[key]:
-                            self.ids.canvasID.canvas.remove(self.graph[key][secondKey])
+                            if isinstance(self.graph[key][secondKey][0],InstructionGroup):
+                                self.ids.canvasID.canvas.remove(self.graph[key][secondKey][0])
+                            else:
+                                self.remove_widget(self.graph[key][secondKey][0])
+                        self.graph.pop(key)
+                        
+
                         #delete all edges pointing to this node
                         for firstKey in self.graph:
                             for secondKey in self.graph[firstKey]:
                                 if secondKey == key:
-                                    self.ids.canvasID.canvas.remove(self.graph[firstKey].pop(secondKey))
+                                    if isinstance(self.graph[firstKey][secondKey][0],InstructionGroup):
+                                        self.ids.canvasID.canvas.remove(self.graph[firstKey].pop(secondKey)[0])
+                                    else:
+                                        test = self.graph[firstKey][secondKey][0]
+                                        self.remove_widget(test)
                                     break
-                        self.graph.pop(key)
+                        
                         #delete the label
                         l = self.LabelDict.pop(key)
                         item = self.circleDict.pop(key)
@@ -104,12 +138,26 @@ class MyBoxLayout(Widget):
                         self.ids.canvasID.canvas.remove(item)
                         break
     
+
+
+    def solve(self):
+        
+        graph = Graph(self.convertNodesToList())
+        graph.addEdges(self.convertEdges())
+
     # clears the whole screen
     def clearStuff(self):
+
         #loops through all the labels and removes them
         for key in self.LabelDict:
             self.remove_widget(self.LabelDict[key][0])
         self.ids.canvasID.canvas.clear()
+        
+        for firstKey in self.graph:
+            for secondKey in self.graph[firstKey]:
+                if isinstance(self.graph[firstKey][secondKey][0],Arrow):
+                    self.remove_widget(self.graph[firstKey][secondKey][0])
+
         #resets variables to thier intiall condition 
         self.LabelDict = {}
         self.circleDict = {}
@@ -122,25 +170,35 @@ class MyBoxLayout(Widget):
             Rectangle(size = self.ids.canvasID.size,pos = self.ids.canvasID.pos)
 
     
+
+
     def on_touch_up(self, touch):
         # check if the touch lies in the canvas to draw in
         if(touch.y < self.ids.canvasID.size[1] and touch.y > RADIUS + 20 and touch.x> RADIUS + 20 and touch.x<self.ids.canvasID.size[0]-RADIUS):
+
             # check the state of toogle buttons
             if(self.ids.node_button.state == 'down'):
                 self.drawNode(touch)
-                #creates a new Node
                 return
-            #draws an edge
-            elif(self.ids.rightArrowID.state == 'down'):
+
+            elif self.ids.doubleArrowID.state == 'down':
+
                 for key in self.LabelDict:
                         if touch.x > self.LabelDict[key][0].x and touch.y > self.LabelDict[key][0].y and touch.x < self.LabelDict[key][0].x +RADIUS*2 and touch.y<self.LabelDict[key][0].y+RADIUS*2:
-                            if self.count == 2:  
+                            if self.count == 2: 
+
                                 self.count  = 1
                                 self.obj = InstructionGroup()
                                 self.obj.add(Color(0,0,0,1,mode='rgba'))
                                 self.obj.add(Line(points=[self.LabelDict[self.firstNode][0].x+RADIUS, self.LabelDict[self.firstNode][0].y+RADIUS,
                                 self.LabelDict[key][0].x +RADIUS, self.LabelDict[key][0].y+RADIUS],width = 2))
-                                self.graph[self.firstNode][key] = self.obj
+
+
+                                cost = 0
+                                print(cost)
+                                self.graph[self.firstNode][key] = (self.obj,cost)
+                                self.graph[key][self.firstNode] = (self.obj,cost)
+                                
                                 self.ids.canvasID.canvas.add(self.obj)
 
                                 firstLabel = self.LabelDict[key][0]
@@ -149,6 +207,7 @@ class MyBoxLayout(Widget):
                                 #triger a redraw of the 2 nodes by removing them and then adding them again
                                 item1 = self.circleDict[key]
                                 item2  = self.circleDict[self.firstNode]
+
                                 self.remove_widget(firstLabel)
                                 self.remove_widget(secondLabel)
                                 self.ids.canvasID.canvas.remove(item1)
@@ -161,7 +220,38 @@ class MyBoxLayout(Widget):
                                 self.startNode = None
                                 return 
                             else:
+                                self.count += 1
+                                self.firstNode = key
+                                return 
+                return
 
+            #draws an edge
+            elif(self.ids.rightArrowID.state == 'down'):
+                for key in self.LabelDict:
+                        if touch.x > self.LabelDict[key][0].x and touch.y > self.LabelDict[key][0].y and touch.x < self.LabelDict[key][0].x +RADIUS*2 and touch.y<self.LabelDict[key][0].y+RADIUS*2:
+                            if self.count == 2:  
+                                self.count  = 1
+
+                                vx = self.LabelDict[key][0].x+RADIUS-(self.LabelDict[self.firstNode][0].x+RADIUS)
+                                vy = self.LabelDict[key][0].y+RADIUS-(self.LabelDict[self.firstNode][0].y+RADIUS)
+                                distance = math.sqrt(((vx)**2)+((vy)**2))
+                                ax =(self.LabelDict[self.firstNode][0].x+RADIUS) + vx /distance * RADIUS 
+                                ay = (self.LabelDict[self.firstNode][0].y+RADIUS) + vy /distance * RADIUS
+
+                                self.arrow = Arrow(main_color = [0,0,0,0.8],o_x = ax, o_y = ay,
+                                fletching_radius = 0, head_angle= 30, to_x = self.LabelDict[key][0].x+RADIUS, to_y = self.LabelDict[key][0].y+RADIUS, shaft_width = 2,outline_color = [1,1,1,1],
+                                distance = distance-2*RADIUS )
+
+                                cost = 0 #update with textbox
+                                
+                                self.graph[self.firstNode][key] = (self.arrow,cost)
+                                
+                                self.add_widget(self.arrow)
+
+                                
+                                self.startNode = None
+                                return 
+                            else:
                                 self.count += 1
                                 self.firstNode = key
                                 return 

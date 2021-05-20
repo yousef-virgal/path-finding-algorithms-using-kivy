@@ -1,4 +1,5 @@
 <MyBoxLayout>:
+    textBoxID:textBoxID
     canvas:
         Color:
             rgba: 0.5, 0.5, 0.5, 0.5
@@ -48,16 +49,18 @@
                     center_x: self.parent.x + self.parent.width/2
                     size: 25,25
                     allow_stretch: True
-            # Button:
-            #     pos_hint:{'top':1}
-            #     size_hint:(0.15,0.5)
-            #     Image:
-            #         pos_hint_y : None
-            #         source: 'reversed-arrow.png'
-            #         center_y: (self.parent.y + self.parent.height/2)
-            #         center_x: self.parent.x + self.parent.width/2
-            #         size: 25,25
-            #         allow_stretch: True
+            ToggleButton:
+                id:doubleArrowID
+                pos_hint:{'top':1}
+                size_hint:(0.15,0.5)
+                on_press:root.makeAllButtonsUp(doubleArrowID)
+                Image:
+                    pos_hint_y : None
+                    source: 'doublearrow.png'
+                    center_y: (self.parent.y + self.parent.height/2)
+                    center_x: self.parent.x + self.parent.width/2
+                    size: 25,25
+                    allow_stretch: True
             # Button:
             #     pos_hint:{'top':1}
             #     size_hint:(0.15,0.5)
@@ -80,7 +83,7 @@
                 spacing:5
                 pos_hint:{'top':1}
                 size_hint:(0.15,0.5)
-                on_press:print(self.parent.y + self.parent.height/2)
+                on_press:root.solve()
                 background_color:0,2,0,1
 
                 Image:
@@ -96,6 +99,12 @@
                 size_hint:(0.15,0.5)
                 on_press:root.clearStuff()
                 background_color:2,0,0,1
+
+            TextInput:
+                id:textBoxID
+                multiline:False
+                pos_hint:{'top':1}
+                size_hint:(0.15,0.50)
         FloatLayout:
             size_hint:(1,0.85)
             id:canvasID

@@ -5,12 +5,15 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.widget import Widget
 from kivy.lang import Builder, builder
-from kivy.properties import ObjectProperty
 from kivy.graphics import Ellipse,Color,Line,InstructionGroup,Rectangle
-from algo import Node,Graph
-from arrow import * 
+from datastructures import Node,Graph
+from arrow import *
+from algo import Algorthims 
 from kivy.animation import Animation
 import math
+import  time
+import threading
+
 
 RADIUS = 22
 
@@ -37,6 +40,7 @@ class MyBoxLayout(Widget):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.toggleButtons = [self.ids.node_button, self.ids.clearButtonID, self.ids.rightArrowID]
+        
 
 
     def makeAllButtonsUp(self,savedbutton):
@@ -46,7 +50,7 @@ class MyBoxLayout(Widget):
             else:
                 i.state = 'normal'
 
-
+            
     def animate_button(self,widget):
         pass
 
@@ -62,7 +66,7 @@ class MyBoxLayout(Widget):
             xPos = self.LabelDict[key][0].x
             yPos = self.LabelDict[key][0].y 
             isEnd = self.LabelDict[key][1]
-            list.append(Node(xPos,yPos,key,isEnd))
+            list.append(Node(xPos,yPos,key,RADIUS,isEnd))
         return list 
     
     def convertEdges(self):
@@ -71,6 +75,17 @@ class MyBoxLayout(Widget):
             for secondKey in self.graph[firstKey]:
                 edges.append((firstKey,secondKey,self.graph[firstKey][secondKey][1]))
         return edges
+
+
+    def drawYellow(self,node):
+
+        self.obj = InstructionGroup()
+        self.obj.add(Color(1,1,0,1,mode="rgba"))
+        self.obj.add(Ellipse(pos=(node.xPos,node.yPos),size = (node.size*2,node.size*2)))
+        self.ids.canvasID.canvas.remove(self.circleDict[node.identfier])
+        self.circleDict[node.identfier] = self.obj
+        self.ids.canvasID.canvas.add(self.obj)
+        
 
 
     # draws a node on to the screen
@@ -86,11 +101,13 @@ class MyBoxLayout(Widget):
             self.startNode = False
         elif touch.button == 'right':
             self.obj.add(Color(0,0,1,1,mode = "rgba"))
+            endNode = True
         else:
             self.obj.add(Color(rgb=(1,0,0)))
         #adds the ellipse and draws on to the canvas
         self.obj.add(Ellipse(pos=(touch.x-RADIUS,touch.y-RADIUS),size=(RADIUS*2,RADIUS*2)))
         self.ids.canvasID.canvas.add(self.obj)
+        
         #adds the label and adds it to widgets
         l = Label(text= self.alphabetOrder, pos = [touch.x-RADIUS,touch.y-RADIUS],font_size = 15,color = (0,0,0,1),
         size = (RADIUS*2,RADIUS*2),pos_hint = (1,1),size_hint=(0.2,0.2))
@@ -139,11 +156,13 @@ class MyBoxLayout(Widget):
                         break
     
 
-
     def solve(self):
-        
+
         graph = Graph(self.convertNodesToList())
         graph.addEdges(self.convertEdges())
+        algo = Algorthims(graph,'A',self)
+        thread = threading.Thread(target = algo.BFS)
+        thread.start()
 
     # clears the whole screen
     def clearStuff(self):
@@ -195,7 +214,7 @@ class MyBoxLayout(Widget):
 
 
                                 cost = 0
-                                print(cost)
+                                
                                 self.graph[self.firstNode][key] = (self.obj,cost)
                                 self.graph[key][self.firstNode] = (self.obj,cost)
                                 

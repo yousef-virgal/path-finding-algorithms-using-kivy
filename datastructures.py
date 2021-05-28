@@ -1,10 +1,12 @@
 class Node:
-    def __init__(self,xPos,yPos,identfier,size,isEnd) -> None:
+    def __init__(self,xPos,yPos,identfier,size,isEnd,hur,parent = None) -> None:
         self.xPos = xPos 
         self.yPos = yPos
         self.identfier = identfier
         self.isEnd = isEnd
         self.size = size
+        self.hur = hur
+        self.parent = parent
 
 
 class Graph:
@@ -14,12 +16,19 @@ class Graph:
         self.nodes = Nodes
         for node in self.nodes:
             self.adj_list[node.identfier] = []
-
+    
     def getNode(self,identfier):
         for node in self.nodes:
             if node.identfier == identfier:
                 return node
         return None
+
+    def getNodeNextList(self , identifier):
+        for node in self.nodes:
+            if node.identfier == identifier:
+                return self.adj_list[node.identfier]
+        return None
+
     def addEdges(self,Edges):
         for edge in Edges:
             From,to,cost = edge 
@@ -33,8 +42,9 @@ class Graph:
             print(node.identfier,":",self.adj_list[node.identfier])
 
 if __name__ == "__main__":
-    nodes = [Node(1,1,"1",False),Node(2,2,"2",False),Node(3,3,"3",False),Node(4,4,"4",False)]
+    nodes = [Node(1,1,"1",1,False,0),Node(2,2,"2",1,False,0),Node(3,3,"3",1,False,0),Node(4,4,"4",1,False,0)]
     Edges = [("1","2",3),("1","3",6),("2","4",5),("1","4",9)]
     graph = Graph(nodes)
     graph.addEdges(Edges)
+    print(graph.getNodeNextList("1"))
     graph.printGraph()

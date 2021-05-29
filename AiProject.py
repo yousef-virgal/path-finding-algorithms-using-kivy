@@ -213,11 +213,12 @@ class MyBoxLayout(Widget):
             hur = int(self.ids.textBoxID.text)
         else:
             print('hi')
+        heur = Label()
 
 
 
         #adds the label and adds it to widgets
-        l = Label(text= self.alphabetOrder, pos = [touch.x-RADIUS,touch.y-RADIUS],font_size = 15,color = (0,0,0,1),
+        l = Label(text= self.alphabetOrder +'\n'+ str(hur), pos = [touch.x-RADIUS,touch.y-RADIUS],font_size = 15,color = (0,0,0,1),
         size = (RADIUS*2,RADIUS*2),pos_hint = (1,1),size_hint=(0.2,0.2))
         self.add_widget(l)
         #adds the label and instruction groups to the dictionaries
@@ -354,8 +355,8 @@ class MyBoxLayout(Widget):
                                 cost = int(self.ids.textBoxID.text)
                                 point1 = [self.LabelDict[self.firstNode][0].x+RADIUS,self.LabelDict[self.firstNode][0].y+RADIUS]
                                 point2 = [self.LabelDict[key][0].x +RADIUS,self.LabelDict[key][0].y+RADIUS]
-                                midPoint = [((point1[0]+point2[0])/2)-10 ,((point1[1]+point2[1])/2)-10 ]
-                                costLabel = Label(text = self.ids.textBoxID.text,pos = midPoint,font_size = '10sp' , color = [1,0,0,1])
+                                midPoint = [((point1[0]+point2[0])/2) ,((point1[1]+point2[1])/2)+20 ]
+                                costLabel = Label(text = self.ids.textBoxID.text,pos = midPoint,font_size = '20sp' , color = [1,0,0,1],size = (10,10))
                                 print('I am here')
                                 print(midPoint)
                                 print(costLabel.text)

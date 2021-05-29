@@ -152,6 +152,7 @@ class Algorthims:
                     print(non_visited)
             return
     def astar(self):
+        
             visited = []
             myStartNode = self.graph.getNode(self.startNode)
             non_visited = [{myStartNode:myStartNode.identfier, 'cost':0}]
@@ -205,5 +206,54 @@ class Algorthims:
                 print('non visited ya beh')
                 print(non_visited)
             return
-    
+    def greedy(self):
+        visited = []
+        myStartNode = self.graph.getNode(self.startNode)
+        non_visited = [{myStartNode:myStartNode.identfier, 'cost':0}]
+        path = []
+        while len(non_visited) != 0:
+            victim = non_visited.pop(0)
+            victimDict = victim
+            cost = victimDict.get('cost')
+            for i in victimDict.items() :
+                print(i)
+                victim = i[0]
+                break
+                
+            lock = threading.Lock()
+            lock.acquire()
+            node = self.graph.getNode(victim.identfier)
+            self.window.drawYellow(node)
+            time.sleep(0.1)
+            lock.release()
+            path.append({victim.identfier:cost})
+            if node.isEnd:
+                currentNode = node
+                while currentNode.parent != None:
+                    lock.acquire()
+                    self.window.drawPurple(currentNode)
+                        
+                    self.window.changeLineColor(currentNode.parent,currentNode)
+                    time.sleep(0.1)
+                    lock.release()
+                    currentNode = currentNode.parent
+
+                lock.acquire()
+                self.window.drawPurple(currentNode)
+                lock.release()
+                return
+                
+            visited.append(victim)
+            afterVictimList = self.graph.getNodeNextList(victim.identfier)
+
+            for i in afterVictimList:
+                if i[0] not in visited:
+                    self.graph.getNode(i[0]).parent = node
+                    non_visited.append({self.graph.getNode(i[0][0]):self.graph.getNode(i[0][0]).identfier,'cost':(self.graph.getNode(i[0]).hur )})
+
+                #Sorting non_visited by values 
+            non_visited = sorted(non_visited, key = lambda kv:kv['cost'])
+            print('non visited ya beh')
+            print(non_visited)
+        return    
                     

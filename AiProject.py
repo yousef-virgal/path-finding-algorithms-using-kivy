@@ -282,6 +282,8 @@ class MyBoxLayout(Widget):
             thread = threading.Thread(target = algo.ucs)
         elif(self.algoType == Types.ASTAR):
             thread = threading.Thread(target = algo.astar)
+        elif(self.algoType == Types.GREDY):
+            thread = threading.Thread(target = algo.greedy)
         else:
             return
         print('algo type -->-')

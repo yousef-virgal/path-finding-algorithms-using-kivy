@@ -116,6 +116,22 @@ class MyBoxLayout(Widget):
             #Choose Algorithm Warning
             pass
         return
+
+    def deleteDraw(self):
+        for first in self.graph:
+            for second in self.graph[first]:
+                if isinstance(self.graph[first][second][0],InstructionGroup):
+                    self.ids.canvasID.canvas.remove(self.graph[first][second][0])
+                    self.obj = InstructionGroup()
+                    self.obj.add(Color(0,0,0,1,mode='rgba'))
+                    self.obj.add(Line(points=[self.LabelDict[first][0].x+RADIUS, self.LabelDict[first][0].y+RADIUS,
+                                self.LabelDict[second][0].x +RADIUS, self.LabelDict[second][0].y+RADIUS],width = 2))
+                    self.ids.canvasID.canvas.add(self.obj)
+                    self.graph[first][second][0] = self.obj
+                else:
+                    self.graph[first][second][0].main_color = [0,0,0,0.8]
+                    
+        self.resetColors()
         
             
 
@@ -207,14 +223,19 @@ class MyBoxLayout(Widget):
             self.remove_widget(self.LabelDict[circle][0])
             self.ids.canvasID.canvas.remove(self.circleDict[circle])
             self.obj = InstructionGroup()
-            self.obj.add(Color(rgb=(1,0,0)))
+            if circle == 'A':
+                self.obj.add(Color(rgb=(0,1,0)))
+            elif self.LabelDict[circle][1]:
+                self.obj.add(Color(rgb=(0,0,1)))
+            else:
+                self.obj.add(Color(rgb=(1,0,0)))
             self.obj.add(Ellipse(pos=(self.LabelDict[circle][0].x,self.LabelDict[circle][0].y),size=(RADIUS*2,RADIUS*2)))
             self.circleDict[circle] = self.obj
             self.ids.canvasID.canvas.add(self.obj)   
             l = Label(text= "{}\n{}".format(str(circle),self.LabelDict[circle][2]), pos = [self.LabelDict[circle][0].x,self.LabelDict[circle][0].y],font_size = 15,color = (0,0,0,1),
             size = (RADIUS*2,RADIUS*2),pos_hint = (1,1),size_hint=(0.2,0.2))
             self.add_widget(l)
-            self.LabelDict[circle][0] = l  
+            self.LabelDict[circle][0] = l
     # draws a node on to the screen
     def drawNode(self,touch):
 
@@ -296,7 +317,7 @@ class MyBoxLayout(Widget):
         graph.addEdges(self.convertEdges())
         algo = Algorthims(graph,'A',self)
         self.setAlgorithmType(self.spinnerChoice)
-        
+        self.deleteDraw()
         if(self.algoType == Types.BFS):
             thread = threading.Thread(target = algo.BFS)
         elif(self.algoType == Types.DFS):

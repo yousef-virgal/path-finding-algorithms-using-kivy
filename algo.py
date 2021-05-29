@@ -2,6 +2,7 @@ import queue
 import time
 import threading
 from kivy.graphics import InstructionGroup
+from queue import PriorityQueue
 
 class Algorthims:
     
@@ -86,53 +87,49 @@ class Algorthims:
         return
 
     def ucs(self):
-            visited = []
-            myStartNode = self.graph.getNode(self.startNode)
-            non_visited = [{myStartNode:myStartNode.identfier, 'cost':0}]
-
-            while non_visited:
-                victim = non_visited.pop(0)
-                visited.append(victim)
-                victimDict = victim
-                cost = victimDict.get('cost')
-
-                for i in victimDict.items() :
-                    victim = i[0]
-                    break
-                
-                lock = threading.Lock()
-                lock.acquire()
-                node = self.graph.getNode(victim.identfier)
-                self.window.drawYellow(node)
-                time.sleep(self.window.speed*1.5/100)
-                lock.release()
-
-                if node.isEnd:
-                    currentNode = node
-                    while currentNode.parent != None:
-                        lock.acquire()
-                        self.window.drawPurple(currentNode)
-                        
-                        self.window.changeLineColor(currentNode.parent,currentNode)
-                        time.sleep(self.window.speed*1.5/100)
-                        lock.release()
-                        currentNode = currentNode.parent
-
+        visited = []
+        queue = PriorityQueue()
+        first =True
+        queue.put((0,self.startNode))
+        while queue:
+            item = queue.get()
+            print(item)
+            visited.append(item[1])
+            node = self.graph.getNode(item[1])
+            lock = threading.Lock()
+            lock.acquire()
+            self.window.drawYellow(node)
+            time.sleep(self.window.speed*1.5/100)
+            lock.release()
+            if node.isEnd:
+                currentNode = node
+                while currentNode.parent != None:
                     lock.acquire()
                     self.window.drawPurple(currentNode)
+                     
+                    self.window.changeLineColor(currentNode.parent,currentNode)
+                    time.sleep(self.window.speed*1.5/100)
                     lock.release()
-                    return
-                
-                
-                afterVictimList = self.graph.getNodeNextList(victim.identfier)
+                    currentNode = currentNode.parent
 
-                for i in afterVictimList:
-                    if i[0] not in visited:
-                        self.graph.getNode(i[0]).parent = node
-                        non_visited.append({self.graph.getNode(i[0][0]):self.graph.getNode(i[0][0]).identfier,'cost':(i[1] + cost)})
-                        #Sorting non_visited by values 
-                        non_visited = sorted(non_visited, key = lambda kv:kv['cost'])
-            return
+                lock.acquire()
+                self.window.drawPurple(currentNode)
+                lock.release()
+                return
+            count = 1
+            for i in self.graph.adj_list[item[1]]:
+                if i[0] not in visited:
+                    
+                    self.graph.getNode(i[0]).parent = node
+                    if count == 1:
+                        queue.put((0+i[1],i[0]))
+                        continue
+                        
+                    else:
+                        print(self.graph[node.parent.identfier][node.identfier])
+                        print(i[1])
+                        queue.put((self.graph[node.parent.identfier][node.identfier]+i[1],i[0]))
+            count += 1
     def IDS(self,maxDepth = 10):
         for i in range(maxDepth):
             if self.DS(i):

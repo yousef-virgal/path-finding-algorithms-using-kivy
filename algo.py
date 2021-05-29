@@ -2,7 +2,6 @@ import queue
 import time
 import threading
 from kivy.graphics import InstructionGroup
-import EuroVar
 
 class Algorthims:
     

@@ -1,7 +1,6 @@
 from types import MethodType
 from typing import Text
 from kivy.config import Config
-import EuroVar
 from kivy.uix.gridlayout import GridLayout
 Config.set('graphics', 'resizable', False)
 Config.set('kivy','window_icon','wireless-connectivity.png')
@@ -33,7 +32,6 @@ class  MyPopup(Popup):
         app.fileBeforeName=self.ids.filechooser.path
         app.fileNameOnly = self.ids.chooserName.text
         app.filePath = app.fileBeforeName + '\\' + app.fileNameOnly
-        print(app.filePath)
 
 
 
@@ -82,13 +80,9 @@ class MyBoxLayout(Widget):
         
     def changePathLabel(self):
         app = App.get_running_app()
-        print('mn dakhel change path label')
-        print(app.fileBeforeName)
         self.ids.pathLabel.text = app.fileBeforeName
     def saveButton(self):
         app = App.get_running_app()
-        print("Saved at ")
-        print(app.filePath)
         self.export_to_png(app.filePath)
     def exportImage(self):
         pass
@@ -302,9 +296,6 @@ class MyBoxLayout(Widget):
         graph.addEdges(self.convertEdges())
         algo = Algorthims(graph,'A',self)
         self.setAlgorithmType(self.spinnerChoice)
-        print("Text box -->")
-        print(self.ids.textBoxID)
-    
         
         if(self.algoType == Types.BFS):
             thread = threading.Thread(target = algo.BFS)
@@ -315,10 +306,7 @@ class MyBoxLayout(Widget):
         elif(self.algoType == Types.ASTAR):
             thread = threading.Thread(target = algo.astar)
         elif(self.algoType == Types.IDS):
-            print("Before is numeric")
-            print(self.ids.textBoxID.text)
             if self.ids.textBoxID.text.isnumeric():
-                print("Hello from is numeric")
                 maxDepth = int(self.ids.textBoxID.text)
             else:
                 maxDepth = 10

@@ -21,7 +21,7 @@ class Algorthims:
             lock = threading.Lock()
             lock.acquire()
             self.window.drawYellow(node)
-            time.sleep(0.1)
+            time.sleep(self.window.speed*1.5/100)
             lock.release()
             
             if node.isEnd:
@@ -31,7 +31,7 @@ class Algorthims:
                     self.window.drawPurple(currentNode)
                      
                     self.window.changeLineColor(currentNode.parent,currentNode)
-                    time.sleep(0.1)
+                    time.sleep(self.window.speed*1.5/100)
                     lock.release()
                     currentNode = currentNode.parent
 
@@ -57,7 +57,7 @@ class Algorthims:
             lock = threading.Lock()
             lock.acquire()
             self.window.drawYellow(node)
-            time.sleep(0.1)
+            time.sleep(self.window.speed*1.5/100)
             lock.release()
             
             if node.isEnd:
@@ -67,7 +67,7 @@ class Algorthims:
                     self.window.drawPurple(currentNode)
                      
                     self.window.changeLineColor(currentNode.parent,currentNode)
-                    time.sleep(0.1)
+                    time.sleep(self.window.speed*1.5/100)
                     lock.release()
                     currentNode = currentNode.parent
 
@@ -104,7 +104,7 @@ class Algorthims:
                 lock.acquire()
                 node = self.graph.getNode(victim.identfier)
                 self.window.drawYellow(node)
-                time.sleep(0.1)
+                time.sleep(self.window.speed*1.5/100)
                 lock.release()
 
                 if node.isEnd:
@@ -114,7 +114,7 @@ class Algorthims:
                         self.window.drawPurple(currentNode)
                         
                         self.window.changeLineColor(currentNode.parent,currentNode)
-                        time.sleep(0.1)
+                        time.sleep(self.window.speed*1.5/100)
                         lock.release()
                         currentNode = currentNode.parent
 
@@ -152,7 +152,7 @@ class Algorthims:
             lock = threading.Lock()
             lock.acquire()
             self.window.drawYellow(node)
-            time.sleep(0.1)
+            time.sleep(self.window.speed*1.5/100)
             lock.release()
 
             if node.isEnd:
@@ -162,7 +162,7 @@ class Algorthims:
                     self.window.drawPurple(currentNode)
                      
                     self.window.changeLineColor(currentNode.parent,currentNode)
-                    time.sleep(0.1)
+                    time.sleep(self.window.speed*1.5/100)
                     lock.release()
                     currentNode = currentNode.parent
 
@@ -198,7 +198,7 @@ class Algorthims:
                 lock.acquire()
                 node = self.graph.getNode(victim.identfier)
                 self.window.drawYellow(node)
-                time.sleep(0.1)
+                time.sleep(self.window.speed*1.5/100)
                 lock.release()
                 path.append({victim.identfier:cost})
                 if node.isEnd:
@@ -208,7 +208,7 @@ class Algorthims:
                         self.window.drawPurple(currentNode)
                             
                         self.window.changeLineColor(currentNode.parent,currentNode)
-                        time.sleep(0.1)
+                        time.sleep(self.window.speed*1.5/100)
                         lock.release()
                         currentNode = currentNode.parent
 
@@ -250,7 +250,7 @@ class Algorthims:
             lock.acquire()
             node = self.graph.getNode(victim.identfier)
             self.window.drawYellow(node)
-            time.sleep(0.1)
+            time.sleep(self.window.speed*1.5/100)
             lock.release()
             path.append({victim.identfier:cost})
             if node.isEnd:
@@ -260,7 +260,7 @@ class Algorthims:
                     self.window.drawPurple(currentNode)
                         
                     self.window.changeLineColor(currentNode.parent,currentNode)
-                    time.sleep(0.1)
+                    time.sleep(self.window.speed*1.5/100)
                     lock.release()
                     currentNode = currentNode.parent
 

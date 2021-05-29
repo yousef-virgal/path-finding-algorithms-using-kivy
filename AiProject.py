@@ -66,8 +66,7 @@ class MyBoxLayout(Widget):
     cost_right_flag = False
     cost_double_flag = False
     firstFlag = False
-    
-
+    speed = 20
     #Constructor -->
     def __init__(self, **kwargs)->None:
         super().__init__(**kwargs)
@@ -78,6 +77,8 @@ class MyBoxLayout(Widget):
         show = P()
         popupWindow = Popup(title = "Heurstic",content = show , size_hint=(None,None),size=(400,400))
         popupWindow.open()
+    def updateValue(self,*args):
+        self.speed = args[1]
     def setAlgorithmType(self,spinnerValue):
         #"A*","Greedy","Breadth first search","Depth first search","Uniformed cost search"]
         if(spinnerValue == "Breadth first search"):

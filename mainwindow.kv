@@ -105,6 +105,16 @@
                 size_hint:(0.15,0.5)
                 on_press:root.clearStuff()
                 background_color:2,0,0,1
+            Slider:
+                id:mySlider
+                pos_hint:{'top':1}
+                size_hint:(0.3,0.5)
+                min:0
+                max:100
+                value:20
+                step:1
+                orientation:"horizontal"
+                on_value:root.updateValue(*args)
 
             
         FloatLayout:

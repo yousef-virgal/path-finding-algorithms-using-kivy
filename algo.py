@@ -135,8 +135,6 @@ class Algorthims:
                         non_visited = sorted(non_visited, key = lambda kv:kv['cost'])
             return
     def IDS(self,maxDepth = 10):
-        print('Print hena ybasha max depth')
-        print(maxDepth)
         for i in range(maxDepth):
             if self.DS(i):
                 return
@@ -192,9 +190,7 @@ class Algorthims:
                 victimDict = victim
                 cost = victimDict.get('cost')
                 for i in victimDict.items():
-                    print(i)
                     victim = i[0]
-                    print(victim)
                     break
                 lock = threading.Lock()
                 lock.acquire()
@@ -217,8 +213,6 @@ class Algorthims:
                     lock.acquire()
                     self.window.drawPurple(currentNode)
                     lock.release()
-        
-                    print(path)
                     return
                 if(cost != 0):    
                     cost = cost - victim.hur
@@ -230,7 +224,6 @@ class Algorthims:
                     if i[0] not in visited:
                         self.graph.getNode(i[0]).parent = node
                         non_visited.append({self.graph.getNode(i[0][0]):self.graph.getNode(i[0][0]).identfier,'cost':(i[1] + cost +self.graph.getNode(i[0]).hur )})
-                        print(non_visited)
                 #Sorting non_visited by values 
                 non_visited = sorted(non_visited, key = lambda kv:kv['cost'])
             return
@@ -244,7 +237,6 @@ class Algorthims:
             victimDict = victim
             cost = victimDict.get('cost')
             for i in victimDict.items() :
-                print(i)
                 victim = i[0]
                 break
                 
@@ -281,7 +273,5 @@ class Algorthims:
 
                 #Sorting non_visited by values 
             non_visited = sorted(non_visited, key = lambda kv:kv['cost'])
-            print('non visited ya beh')
-            print(non_visited)
         return    
                     

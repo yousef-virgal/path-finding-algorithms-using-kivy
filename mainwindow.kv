@@ -15,7 +15,9 @@
             orientation: 'horizontal'
             size_hint:(1,0.15)
             Button:
+                id:exportID
                 text: 'Export'
+                
                 pos_hint:{'top':1}
                 size_hint:(0.15,0.5)
             ToggleButton:
@@ -56,10 +58,10 @@
                 on_press:root.makeAllButtonsUp(doubleArrowID)
                 Image:
                     pos_hint_y : None
-                    source: 'doublearrow.png'
+                    source: 'double-arrow.png'
                     center_y: (self.parent.y + self.parent.height/2)
                     center_x: self.parent.x + self.parent.width/2
-                    size: 25,25
+                    size: 100,100
                     allow_stretch: True
             # Button:
             #     pos_hint:{'top':1}
@@ -71,7 +73,11 @@
             #         center_x: self.parent.x + self.parent.width/2
             #         size: 25,25
             #         allow_stretch: True
-                    
+            TextInput:
+                id:textBoxID
+                multiline:False
+                pos_hint:{'top':1}
+                size_hint:(0.25,0.50) 
             Spinner:
                 id: algorithm_spinner
                 text:'Algorithm: '
@@ -100,11 +106,7 @@
                 on_press:root.clearStuff()
                 background_color:2,0,0,1
 
-            TextInput:
-                id:textBoxID
-                multiline:False
-                pos_hint:{'top':1}
-                size_hint:(0.15,0.50)
+            
         FloatLayout:
             size_hint:(1,0.85)
             id:canvasID
@@ -114,3 +116,6 @@
                 Rectangle: #woohoo!!!
                     size: self.size
                     pos: self.pos
+           
+
+

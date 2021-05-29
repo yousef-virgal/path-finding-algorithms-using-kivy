@@ -1,3 +1,5 @@
+
+
 <MyBoxLayout>:
     canvas:
         Color:
@@ -14,6 +16,7 @@
             orientation: 'horizontal'
             size_hint:(1,0.15)
             Button:
+                id:exportID
                 text: 'Export'
                 pos_hint:{'top':1}
                 size_hint:(0.15,0.5)
@@ -101,3 +104,15 @@
                 Rectangle: #woohoo!!!
                     size: self.size
                     pos: self.pos
+<P>:
+    Label:
+        text:"Enter heuristic"
+        size_hint: 0.6,0.2
+        pos_hint: 0.5,0.5
+    TextInput:
+        size_hint: 0.6,0.2
+        pos_hint: 0.5,0.5
+    Button:
+        text:'Submit'
+        size_hint: 0.6,0.2
+        pos_hint: 0.5,0.5

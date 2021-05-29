@@ -1,7 +1,17 @@
-from logging import root
+from types import MethodType
+from typing import Text
+from kivy.config import Config
+from kivy.uix.gridlayout import GridLayout
+Config.set('graphics', 'resizable', False)
+Config.set('kivy','window_icon','wireless-connectivity.png')
+from kivy.core.window import Window
+Window.size = (1200,600)
+from logging import root, setLogRecordFactory
 import kivy
 from kivy.app import App
 from kivy.uix.label import Label
+from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.uix.widget import Widget
 from kivy.lang import Builder, builder
@@ -14,6 +24,13 @@ import math
 import  time
 import threading
 from enum import Enum
+from kivy.uix.popup import Popup
+
+class  P(FloatLayout):
+    pass
+
+
+
 
 RADIUS:int = 22
 class Types(Enum):
@@ -26,8 +43,10 @@ class Types(Enum):
     
 
 class MyBoxLayout(Widget):
-
-    toggleButtons:list = []    
+    #List of toggle buttons on the system
+    toggleButtons:list = []  
+    #observer for spinner value intially no algorithm is selected
+    spinnerChoice:str = 'Algorithm'  
     alphabetOrder = 'A'
     #dictionary contains all the labels letters as keys and label objects as values to add  them to the canvas
     LabelDict:dict = {}
@@ -42,13 +61,48 @@ class MyBoxLayout(Widget):
     # variable indicating if a node is a start node or not
     startNode:bool = True
     algoType:Types = Types.BFS # added 
+    heurFlag = False
+    cost_right_flag = False
+    cost_double_flag = False
     #coust = ObjectProperty(None)
 
     #Constructor -->
     def __init__(self, **kwargs)->None:
         super().__init__(**kwargs)
-        self.toggleButtons = [self.ids.node_button, self.ids.clearButtonID, self.ids.rightArrowID]
+        self.toggleButtons = [self.ids.node_button, self.ids.clearButtonID, self.ids.rightArrowID,self.ids.doubleArrowID]
         
+        
+    def show_popup(self):
+        show = P()
+        popupWindow = Popup(title = "Heurstic",content = show , size_hint=(None,None),size=(400,400))
+        popupWindow.open()
+    def setAlgorithmType(self,spinnerValue):
+        #"A*","Greedy","Breadth first search","Depth first search","Uniformed cost search"]
+        if(spinnerValue == "Breadth first search"):
+            self.algoType = Types.BFS
+            
+            
+        elif(spinnerValue == "Depth first search"):
+            self.algoType = Types.DFS
+           
+            
+        elif(spinnerValue == "Uniformed cost search"):
+            self.algoType = Types.UCS
+            
+        elif(spinnerValue == "A*"):
+            self.algoType = Types.ASTAR
+            
+        elif(spinnerValue == "Greedy"):
+            self.algoType = Types.GREDY
+        else:
+            #Choose Algorithm Warning
+            pass
+        return
+        
+            
+
+
+
 
 
     def makeAllButtonsUp(self,savedbutton)->None:
@@ -63,7 +117,7 @@ class MyBoxLayout(Widget):
         pass
 
     def spinner_clicked(self,value):
-        pass
+        self.spinnerChoice = value
     
 
 
@@ -132,6 +186,9 @@ class MyBoxLayout(Widget):
             self.graph[first.identfier][second.identfier][0].main_color = [1,69.0/255.0,0,1]
     # draws a node on to the screen
     def drawNode(self,touch):
+        # heurInput = TextInput(text="Enter Heuristic",multiline =False)
+        # heurInput.pos = touch.x,touch.y
+        # self.add_widget(heurInput)
         # inillize an instruction group for this node
         self.obj = InstructionGroup()
         #variable to track if its an end node
@@ -152,6 +209,10 @@ class MyBoxLayout(Widget):
         
         
         hur = 0# should be taken from textbox
+        if(self.ids.textBoxID.text.isnumeric()):
+            hur = int(self.ids.textBoxID.text)
+        else:
+            print('hi')
 
 
 
@@ -208,7 +269,24 @@ class MyBoxLayout(Widget):
         graph = Graph(self.convertNodesToList())
         graph.addEdges(self.convertEdges())
         algo = Algorthims(graph,'A',self)
-        thread = threading.Thread(target = algo.BFS)
+        self.setAlgorithmType(self.spinnerChoice)
+        print('algoType')
+        print(self.algoType)
+        
+        if(self.algoType == Types.BFS):
+            thread = threading.Thread(target = algo.BFS)
+        elif(self.algoType == Types.DFS):
+            thread = threading.Thread(target = algo.DFS)
+        elif(self.algoType == Types.UCS):
+            thread = threading.Thread(target = algo.ucs)
+        elif(self.algoType == Types.ASTAR):
+            thread = threading.Thread(target = algo.astar)
+        else:
+            return
+        print('algo type -->-')
+        print(type(algo.DFS))
+
+        #thread = threading.Thread(target = self.setAlgorithmType(spinnerValue= self.spinnerChoice))
         thread.start()
 
     # clears the whole screen
@@ -237,18 +315,30 @@ class MyBoxLayout(Widget):
 
     
 
-
+    
     def on_touch_up(self, touch):
         # check if the touch lies in the canvas to draw in
+        
+        if(self.ids.node_button.state == 'down' and self.heurFlag == False ):
+            self.ids.textBoxID.text = "Enter heuristic"
+            self.heurFlag = True
+        elif (self.ids.doubleArrowID.state == 'down' and self.cost_double_flag == False) :
+            self.ids.textBoxID.text = "Enter cost"
+            self.cost_double_flag = True
+        elif(self.ids.rightArrowID.state == 'down' and self.cost_right_flag == False):
+            self.ids.textBoxID.text = "Enter cost"
+            self.cost_right_flag = True
+
         if(touch.y < self.ids.canvasID.size[1] and touch.y > RADIUS + 20 and touch.x> RADIUS + 20 and touch.x<self.ids.canvasID.size[0]-RADIUS):
 
             # check the state of toogle buttons
             if(self.ids.node_button.state == 'down'):
                 self.drawNode(touch)
+
                 return
 
             elif self.ids.doubleArrowID.state == 'down':
-
+                
                 for key in self.LabelDict:
                         if touch.x > self.LabelDict[key][0].x and touch.y > self.LabelDict[key][0].y and touch.x < self.LabelDict[key][0].x +RADIUS*2 and touch.y<self.LabelDict[key][0].y+RADIUS*2:
                             if self.count == 2: 
@@ -260,7 +350,16 @@ class MyBoxLayout(Widget):
                                 self.LabelDict[key][0].x +RADIUS, self.LabelDict[key][0].y+RADIUS],width = 2))
 
 
-                                cost = 0
+                                cost = 0 #update with textbox
+                                cost = int(self.ids.textBoxID.text)
+                                point1 = [self.LabelDict[self.firstNode][0].x+RADIUS,self.LabelDict[self.firstNode][0].y+RADIUS]
+                                point2 = [self.LabelDict[key][0].x +RADIUS,self.LabelDict[key][0].y+RADIUS]
+                                midPoint = [((point1[0]+point2[0])/2)-10 ,((point1[1]+point2[1])/2)-10 ]
+                                costLabel = Label(text = self.ids.textBoxID.text,pos = midPoint,font_size = '10sp' , color = [1,0,0,1])
+                                print('I am here')
+                                print(midPoint)
+                                print(costLabel.text)
+                                self.add_widget(costLabel)
                             
                                 self.graph[self.firstNode][key] = (self.obj,cost)
                                 self.graph[key][self.firstNode] = (self.obj,cost)
@@ -293,6 +392,9 @@ class MyBoxLayout(Widget):
 
             #draws an edge
             elif(self.ids.rightArrowID.state == 'down'):
+                
+                print('basha')
+                print(self.ids.textBoxID.text)
                 for key in self.LabelDict:
                         if touch.x > self.LabelDict[key][0].x and touch.y > self.LabelDict[key][0].y and touch.x < self.LabelDict[key][0].x +RADIUS*2 and touch.y<self.LabelDict[key][0].y+RADIUS*2:
                             if self.count == 2:  
@@ -309,7 +411,8 @@ class MyBoxLayout(Widget):
                                 distance = distance-2*RADIUS )
 
                                 cost = 0 #update with textbox
-                                
+                                cost = int(self.ids.textBoxID.text)
+
                                 self.graph[self.firstNode][key] = (self.arrow,cost)
                                 
                                 self.add_widget(self.arrow)
@@ -327,12 +430,16 @@ class MyBoxLayout(Widget):
                 self.clearNode(touch.x,touch.y)
                 return
                 #delete Node
+            
                 
                 
 class MainWindow(App):
     def build(self):
-       return MyBoxLayout()
+        self.title = 'Path-Finding Algorithms'
+        return MyBoxLayout()
+       
 
 
 if __name__ == '__main__':
+    
     MainWindow().run()

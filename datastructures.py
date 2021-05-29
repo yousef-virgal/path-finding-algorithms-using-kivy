@@ -7,6 +7,7 @@ class Node:
         self.size = size
         self.hur = hur
         self.parent = parent
+        
 
 
 class Graph:
@@ -47,4 +48,7 @@ if __name__ == "__main__":
     graph = Graph(nodes)
     graph.addEdges(Edges)
     print(graph.getNodeNextList("1"))
+    print(type(graph.dfs))
     graph.printGraph()
+    print('\n\n\n')
+    print(type(graph.DFS))

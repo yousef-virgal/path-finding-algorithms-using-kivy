@@ -1,5 +1,26 @@
+#:import Factory kivy.factory.Factory
+<MyPopup@Popup>:
+    id:chooserPopup
+    auto_dismiss:True
+    title:"Export as "
+    BoxLayout:
+        size:root.size
+        pos:root.pos
+        orientation:"vertical"
+        FileChooserIconView:
+            id: filechooser
+        Button:
+            text:"Save"
+            font_size:24
+            size_hint: 0.15,0.1
+            on_release:root.fxport()
+            on_press:root.dismiss()
+        TextInput:
+            id:chooserName
+            text:"default.png"
+            font_size:16
+            size_hint:0.15,0.1
 <MyBoxLayout>:
-    textBoxID:textBoxID
     canvas:
         Color:
             rgba: 0.5, 0.5, 0.5, 0.5
@@ -14,12 +35,34 @@
         BoxLayout:
             orientation: 'horizontal'
             size_hint:(1,0.15)
+            BoxLayout:
+                orientation:'vertical'
+                pos_hint:{'top':1}
+                size_hint:(0.15,0.5*2)
+                Button:
+                    id:browseButton
+                    text: 'Browse'
+                    #on_press:root.exportImage()
+                    pos_hint:{'top':1}
+                    size_hint:(1,1)
+                    on_press: Factory.MyPopup().open()
+                    on_release:root.changePathLabel()
+                Label:
+                    id:pathLabel
+                    text:"path:"
+                    font_size:'10sp'
+                    pos_hint:{'top':1}
+                    size_hint:(1,1)
+                    size: root.size
+
             Button:
                 id:exportID
-                text: 'Export'
-                
+                text: 'Save'
+                #on_press:root.exportImage()
                 pos_hint:{'top':1}
                 size_hint:(0.15,0.5)
+                on_press: root.saveButton()
+
             ToggleButton:
                 id: clearButtonID
                 text: 'Clear'
@@ -117,6 +160,11 @@
                 on_value:root.updateValue(*args)
 
             
+        
+        
+        
+        
+        
         FloatLayout:
             size_hint:(1,0.85)
             id:canvasID

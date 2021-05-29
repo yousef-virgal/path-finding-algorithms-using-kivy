@@ -1,6 +1,7 @@
 from types import MethodType
 from typing import Text
 from kivy.config import Config
+import EuroVar
 from kivy.uix.gridlayout import GridLayout
 Config.set('graphics', 'resizable', False)
 Config.set('kivy','window_icon','wireless-connectivity.png')
@@ -26,8 +27,13 @@ import threading
 from enum import Enum
 from kivy.uix.popup import Popup
 
-class  P(FloatLayout):
-    pass
+class  MyPopup(Popup):
+    def fxport(self):
+        app = App.get_running_app()
+        app.fileBeforeName=self.ids.filechooser.path
+        app.fileNameOnly = self.ids.chooserName.text
+        app.filePath = app.fileBeforeName + '\\' + app.fileNameOnly
+        print(app.filePath)
 
 
 
@@ -65,6 +71,7 @@ class MyBoxLayout(Widget):
     heurFlag = False
     cost_right_flag = False
     cost_double_flag = False
+    EnterMaxLevelFlag = False
     firstFlag = False
     speed = 20
     #Constructor -->
@@ -73,10 +80,18 @@ class MyBoxLayout(Widget):
         self.toggleButtons = [self.ids.node_button, self.ids.clearButtonID, self.ids.rightArrowID,self.ids.doubleArrowID]
         
         
-    def show_popup(self):
-        show = P()
-        popupWindow = Popup(title = "Heurstic",content = show , size_hint=(None,None),size=(400,400))
-        popupWindow.open()
+    def changePathLabel(self):
+        app = App.get_running_app()
+        print('mn dakhel change path label')
+        print(app.fileBeforeName)
+        self.ids.pathLabel.text = app.fileBeforeName
+    def saveButton(self):
+        app = App.get_running_app()
+        print("Saved at ")
+        print(app.filePath)
+        self.export_to_png(app.filePath)
+    def exportImage(self):
+        pass
     def updateValue(self,*args):
         self.speed = args[1]
     def setAlgorithmType(self,spinnerValue):
@@ -98,6 +113,10 @@ class MyBoxLayout(Widget):
         elif(spinnerValue == "Greedy"):
             self.algoType = Types.GREDY
         elif(spinnerValue == "IDS"):
+            if(self.EnterMaxLevelFlag == False):
+                #self.ids.textBoxID.text = "Enter Max level"
+                self.EnterMaxLevelFlag = True
+
             self.algoType = Types.IDS
         else:
             #Choose Algorithm Warning
@@ -120,6 +139,9 @@ class MyBoxLayout(Widget):
 
     def spinner_clicked(self,value):
         self.spinnerChoice = value
+        if value == 'IDS' and self.EnterMaxLevelFlag == False:
+            self.ids.textBoxID.text = 'Enter Max Level '
+            self.EnterMaxLevelFlag = True
     
 
     #convert the dictionary to node list object should be called before creating the graph and passing the result to the graph object
@@ -251,6 +273,7 @@ class MyBoxLayout(Widget):
                                 self.ids.canvasID.canvas.remove(self.graph[key][secondKey][0])
                             else:
                                 self.remove_widget(self.graph[key][secondKey][0])
+                            self.remove_widget(self.graph[key][secondKey][2])
                         self.graph.pop(key)
                         
 
@@ -263,6 +286,7 @@ class MyBoxLayout(Widget):
                                     else:
                                         test = self.graph[firstKey][secondKey][0]
                                         self.remove_widget(test)
+                                    self.remove_widget(self.graph[firstKey][secondKey][2])
                                     break
                         
                         #delete the label
@@ -274,11 +298,13 @@ class MyBoxLayout(Widget):
     
 
     def solve(self):
-
         graph = Graph(self.convertNodesToList())
         graph.addEdges(self.convertEdges())
         algo = Algorthims(graph,'A',self)
         self.setAlgorithmType(self.spinnerChoice)
+        print("Text box -->")
+        print(self.ids.textBoxID)
+    
         
         if(self.algoType == Types.BFS):
             thread = threading.Thread(target = algo.BFS)
@@ -289,7 +315,14 @@ class MyBoxLayout(Widget):
         elif(self.algoType == Types.ASTAR):
             thread = threading.Thread(target = algo.astar)
         elif(self.algoType == Types.IDS):
-            thread = threading.Thread(target = algo.IDS)
+            print("Before is numeric")
+            print(self.ids.textBoxID.text)
+            if self.ids.textBoxID.text.isnumeric():
+                print("Hello from is numeric")
+                maxDepth = int(self.ids.textBoxID.text)
+            else:
+                maxDepth = 10
+            thread = threading.Thread(target = algo.IDS, args= (maxDepth,))
         else:
             return
 
@@ -371,7 +404,7 @@ class MyBoxLayout(Widget):
                                     midPoint = [((point1[0]+point2[0])/2) ,((point1[1]+point2[1])/2) +12.5 ]
                                 else:
                                     midPoint = [((point1[0]+point2[0])/2) +5 ,((point1[1]+point2[1])/2)  ]
-                                costLabel = Label(text = str(cost),pos = midPoint,font_size = '10sp', size = (10,10) , color = [1,0,0,1])
+                                costLabel = Label(text = str(cost),pos = midPoint,font_size = '20sp', size = (10,10) , color = [1,0,0,1])
 
 
                                 self.add_widget(costLabel)
@@ -436,7 +469,7 @@ class MyBoxLayout(Widget):
                                     midPoint = [((point1[0]+point2[0])/2) ,((point1[1]+point2[1])/2) +12.5 ]
                                 else:
                                     midPoint = [((point1[0]+point2[0])/2) +5 ,((point1[1]+point2[1])/2) +5 ]
-                                costLabel = Label(text = str(cost),pos = midPoint,font_size = '10sp' , color = [1,0,0,1])
+                                costLabel = Label(text = str(cost),pos = midPoint,font_size = '20sp' , color = [1,0,0,1],size=(10,10))
                                 
 
                                 self.add_widget(costLabel)
@@ -462,6 +495,9 @@ class MyBoxLayout(Widget):
                 
                 
 class MainWindow(App):
+    fileBeforeName:str =''
+    fileNameOnly:str =''
+    filePathX:str = ''
     def build(self):
         self.title = 'Path-Finding Algorithms'
         return MyBoxLayout()

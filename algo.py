@@ -2,6 +2,7 @@ import queue
 import time
 import threading
 from kivy.graphics import InstructionGroup
+import EuroVar
 
 class Algorthims:
     
@@ -134,7 +135,8 @@ class Algorthims:
                         non_visited = sorted(non_visited, key = lambda kv:kv['cost'])
             return
     def IDS(self,maxDepth = 10):
-
+        print('Print hena ybasha max depth')
+        print(maxDepth)
         for i in range(maxDepth):
             if self.DS(i):
                 return

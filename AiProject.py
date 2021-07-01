@@ -54,6 +54,7 @@ class MyBoxLayout(Widget):
     spinnerChoice:str = 'Algorithm'  
     alphabetOrder = 'A'
     #dictionary contains all the labels letters as keys and label objects as values to add  them to the canvas
+    
     LabelDict:dict = {}
     #dictionary contains all the labels letters as keys and Instruction group as values to be able to remove circlies and re-draw them
     circleDict:dict = {}
@@ -72,6 +73,7 @@ class MyBoxLayout(Widget):
     EnterMaxLevelFlag = False
     firstFlag = False
     speed = 20
+
     #Constructor -->
     def __init__(self, **kwargs)->None:
         super().__init__(**kwargs)
@@ -86,8 +88,11 @@ class MyBoxLayout(Widget):
         self.export_to_png(app.filePath)
     def exportImage(self):
         pass
+
     def updateValue(self,*args):
         self.speed = args[1]
+    
+
     def setAlgorithmType(self,spinnerValue):
         #"A*","Greedy","Breadth first search","Depth first search","Uniformed cost search"]
         if(spinnerValue == "Breadth first search"):
@@ -116,6 +121,23 @@ class MyBoxLayout(Widget):
             #Choose Algorithm Warning
             pass
         return
+
+
+    def deleteDraw(self):
+        for first in self.graph:
+            for second in self.graph[first]:
+                if isinstance(self.graph[first][second][0],InstructionGroup):
+                    self.ids.canvasID.canvas.remove(self.graph[first][second][0])
+                    self.obj = InstructionGroup()
+                    self.obj.add(Color(0,0,0,1,mode='rgba'))
+                    self.obj.add(Line(points=[self.LabelDict[first][0].x+RADIUS, self.LabelDict[first][0].y+RADIUS,
+                                self.LabelDict[second][0].x +RADIUS, self.LabelDict[second][0].y+RADIUS],width = 2))
+                    self.ids.canvasID.canvas.add(self.obj)
+                    self.graph[first][second][0] = self.obj
+                else:
+                    self.graph[first][second][0].main_color = [0,0,0,0.8]
+                    
+        self.resetColors()
         
             
 
@@ -207,14 +229,20 @@ class MyBoxLayout(Widget):
             self.remove_widget(self.LabelDict[circle][0])
             self.ids.canvasID.canvas.remove(self.circleDict[circle])
             self.obj = InstructionGroup()
-            self.obj.add(Color(rgb=(1,0,0)))
+            if circle == 'A':
+                self.obj.add(Color(rgb=(0,1,0)))
+            elif self.LabelDict[circle][1]:
+                self.obj.add(Color(rgb=(0,0,1)))
+            else:
+                self.obj.add(Color(rgb=(1,0,0)))
             self.obj.add(Ellipse(pos=(self.LabelDict[circle][0].x,self.LabelDict[circle][0].y),size=(RADIUS*2,RADIUS*2)))
             self.circleDict[circle] = self.obj
             self.ids.canvasID.canvas.add(self.obj)   
             l = Label(text= "{}\n{}".format(str(circle),self.LabelDict[circle][2]), pos = [self.LabelDict[circle][0].x,self.LabelDict[circle][0].y],font_size = 15,color = (0,0,0,1),
             size = (RADIUS*2,RADIUS*2),pos_hint = (1,1),size_hint=(0.2,0.2))
             self.add_widget(l)
-            self.LabelDict[circle][0] = l  
+            self.LabelDict[circle][0] = l
+
     # draws a node on to the screen
     def drawNode(self,touch):
 
@@ -276,11 +304,12 @@ class MyBoxLayout(Widget):
                             for secondKey in self.graph[firstKey]:
                                 if secondKey == key:
                                     if isinstance(self.graph[firstKey][secondKey][0],InstructionGroup):
-                                        self.ids.canvasID.canvas.remove(self.graph[firstKey].pop(secondKey)[0])
+                                        self.ids.canvasID.canvas.remove(self.graph[firstKey][secondKey][0])
                                     else:
                                         test = self.graph[firstKey][secondKey][0]
                                         self.remove_widget(test)
                                     self.remove_widget(self.graph[firstKey][secondKey][2])
+                                    self.graph[firstKey].pop(secondKey)
                                     break
                         
                         #delete the label
@@ -296,7 +325,7 @@ class MyBoxLayout(Widget):
         graph.addEdges(self.convertEdges())
         algo = Algorthims(graph,'A',self)
         self.setAlgorithmType(self.spinnerChoice)
-        
+        self.deleteDraw()
         if(self.algoType == Types.BFS):
             thread = threading.Thread(target = algo.BFS)
         elif(self.algoType == Types.DFS):
@@ -305,6 +334,8 @@ class MyBoxLayout(Widget):
             thread = threading.Thread(target = algo.ucs)
         elif(self.algoType == Types.ASTAR):
             thread = threading.Thread(target = algo.astar)
+        elif(self.algoType == Types.GREDY):
+            thread = threading.Thread(target = algo.greedy)
         elif(self.algoType == Types.IDS):
             if self.ids.textBoxID.text.isnumeric():
                 maxDepth = int(self.ids.textBoxID.text)

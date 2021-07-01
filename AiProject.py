@@ -54,6 +54,7 @@ class MyBoxLayout(Widget):
     spinnerChoice:str = 'Algorithm'  
     alphabetOrder = 'A'
     #dictionary contains all the labels letters as keys and label objects as values to add  them to the canvas
+    
     LabelDict:dict = {}
     #dictionary contains all the labels letters as keys and Instruction group as values to be able to remove circlies and re-draw them
     circleDict:dict = {}
@@ -72,6 +73,7 @@ class MyBoxLayout(Widget):
     EnterMaxLevelFlag = False
     firstFlag = False
     speed = 20
+
     #Constructor -->
     def __init__(self, **kwargs)->None:
         super().__init__(**kwargs)
@@ -86,8 +88,11 @@ class MyBoxLayout(Widget):
         self.export_to_png(app.filePath)
     def exportImage(self):
         pass
+
     def updateValue(self,*args):
         self.speed = args[1]
+    
+
     def setAlgorithmType(self,spinnerValue):
         #"A*","Greedy","Breadth first search","Depth first search","Uniformed cost search"]
         if(spinnerValue == "Breadth first search"):
@@ -297,11 +302,12 @@ class MyBoxLayout(Widget):
                             for secondKey in self.graph[firstKey]:
                                 if secondKey == key:
                                     if isinstance(self.graph[firstKey][secondKey][0],InstructionGroup):
-                                        self.ids.canvasID.canvas.remove(self.graph[firstKey].pop(secondKey)[0])
+                                        self.ids.canvasID.canvas.remove(self.graph[firstKey][secondKey][0])
                                     else:
                                         test = self.graph[firstKey][secondKey][0]
                                         self.remove_widget(test)
                                     self.remove_widget(self.graph[firstKey][secondKey][2])
+                                    self.graph[firstKey].pop(secondKey)
                                     break
                         
                         #delete the label
@@ -326,6 +332,8 @@ class MyBoxLayout(Widget):
             thread = threading.Thread(target = algo.ucs)
         elif(self.algoType == Types.ASTAR):
             thread = threading.Thread(target = algo.astar)
+        elif(self.algoType == Types.GREDY):
+            thread = threading.Thread(target = algo.greedy)
         elif(self.algoType == Types.IDS):
             if self.ids.textBoxID.text.isnumeric():
                 maxDepth = int(self.ids.textBoxID.text)

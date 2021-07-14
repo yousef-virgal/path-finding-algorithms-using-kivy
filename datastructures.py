@@ -9,9 +9,7 @@ class Node:
         self.parent = parent
         
 
-
 class Graph:
-
     def __init__(self,Nodes) -> None:
         self.adj_list = {}
         self.nodes = Nodes
@@ -41,14 +39,3 @@ class Graph:
     def printGraph(self):
         for node in self.nodes:
             print(node.identfier,":",self.adj_list[node.identfier])
-
-if __name__ == "__main__":
-    nodes = [Node(1,1,"1",1,False,0),Node(2,2,"2",1,False,0),Node(3,3,"3",1,False,0),Node(4,4,"4",1,False,0)]
-    Edges = [("1","2",3),("1","3",6),("2","4",5),("1","4",9)]
-    graph = Graph(nodes)
-    graph.addEdges(Edges)
-    print(graph.getNodeNextList("1"))
-    print(type(graph.dfs))
-    graph.printGraph()
-    print('\n\n\n')
-    print(type(graph.DFS))
